@@ -1,36 +1,36 @@
 // DAX measures used in Oulu_Snow_Delay.pbix
 
-AutumnAvgTemp = CALCULATE ( AVERAGE ( Weather[AvgTemp_C] ), Weather[DayOfSeason] >= 31, Weather[DayOfSeason] <= 70 )
+AutumnAvgTemp = CALCULATE ( AVERAGE ( oulu_snow_clean[AvgTemp_C] ), oulu_snow_clean[DayOfSeason] >= 31, oulu_snow_clean[DayOfSeason] <= 70 )
 
-Frost Days Autumn = CALCULATE ( SUM ( Weather[IsFrostDay] ), Weather[DayOfSeason] >= 31, Weather[DayOfSeason] <= 70 )
+Frost Days Autumn = CALCULATE ( SUM ( oulu_snow_clean[IsFrostDay] ), oulu_snow_clean[DayOfSeason] >= 31, oulu_snow_clean[DayOfSeason] <= 70 )
 
-FirstSnowDay = CALCULATE ( MIN ( Weather[DayOfSeason] ), Weather[HasSnow] = 1 )
+FirstSnowDay = CALCULATE ( MIN ( oulu_snow_clean[DayOfSeason] ), oulu_snow_clean[HasSnow] = 1 )
 
-First Snow Date = CALCULATE ( MIN ( Weather[Date] ), Weather[HasSnow] = 1 )
+First Snow Date = CALCULATE ( MIN ( oulu_snow_clean[Date] ), oulu_snow_clean[HasSnow] = 1 )
 
 PermanentSnowDay =
 MINX (
     FILTER (
-        VALUES ( Weather[DayOfSeason] ),
-        VAR d = Weather[DayOfSeason]
+        VALUES ( oulu_snow_clean[DayOfSeason] ),
+        VAR d = oulu_snow_clean[DayOfSeason]
         RETURN
             CALCULATE (
-                SUM ( Weather[HasSnow] ),
-                Weather[DayOfSeason] >= d,
-                Weather[DayOfSeason] <= d + 29
+                SUM ( oulu_snow_clean[HasSnow] ),
+                oulu_snow_clean[DayOfSeason] >= d,
+                oulu_snow_clean[DayOfSeason] <= d + 29
             ) = 30
     ),
-    Weather[DayOfSeason]
+    oulu_snow_clean[DayOfSeason]
 )
 
 Permanent Snow Date =
 VAR d = [PermanentSnowDay]
-RETURN IF ( ISBLANK ( d ), BLANK (), MIN ( Weather[Date] ) + d - 1 )
+RETURN IF ( ISBLANK ( d ), BLANK (), MIN ( oulu_snow_clean[Date] ) + d - 1 )
 
 Days Without Snow =
 VAR snowDay = [First Snow Date]
-VAR seasonStart = MIN ( Weather[Date] )
-VAR seasonEnd = MAX ( Weather[Date] )
+VAR seasonStart = MIN ( oulu_snow_clean[Date] )
+VAR seasonEnd = MAX ( oulu_snow_clean[Date] )
 RETURN
     IF (
         ISBLANK ( snowDay ),
@@ -42,7 +42,7 @@ Snow Status =
 VAR snowDay = [First Snow Date]
 RETURN
     IF (
-        NOT HASONEVALUE ( Weather[Season] ),
+        NOT HASONEVALUE ( oulu_snow_clean[Season] ),
         "Select one season",
         IF (
             ISBLANK ( snowDay ),
@@ -52,6 +52,6 @@ RETURN
         )
     )
 
-TotalPrecip = SUM ( Weather[Precip_mm] )
-FrostDays = SUM ( Weather[IsFrostDay] )
-SnowDays = SUM ( Weather[HasSnow] )
+TotalPrecip = SUM ( oulu_snow_clean[Precip_mm] )
+FrostDays = SUM ( oulu_snow_clean[IsFrostDay] )
+SnowDays = SUM ( oulu_snow_clean[HasSnow] )

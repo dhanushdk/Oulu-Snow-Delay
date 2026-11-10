@@ -52,7 +52,7 @@ Pellonpää and Kaukovainio overlap for about a year and their snow depths follo
 
 ## Data cleaning
 
-Done in Power Query. The main steps:
+Done in Python with pandas, in `scripts/clean_data.py`. The script reads the raw FMI files from `data/raw/` and writes one clean table that Power BI then loads. The main steps:
 
 - `-` in the FMI files means a missing value → changed to null
 - `-1` in snow depth means no snow, and `-1` in precipitation means no precipitation → changed to 0
@@ -65,7 +65,16 @@ Done in Power Query. The main steps:
   - `IsFrostDay` – 1 if the daily mean temperature is below 0 °C
   - `PrecipType` – Rain, Snow or None, based on precipitation and temperature
 
-The cleaned table is in `data/clean/Weather.csv` (1,531 rows, one per day).
+The cleaned table is in `data/clean/oulu_snow_clean.csv` (1,531 rows, one per day).
+
+To recreate it yourself:
+
+```
+pip install -r requirements.txt
+python scripts/clean_data.py
+```
+
+The script also prints a short quality check: number of rows, date range and missing values. Only one value is missing (precipitation on the last day).
 
 ## Dashboard
 
@@ -179,4 +188,4 @@ Each dot is one season. The x-axis is the average autumn temperature and the y-a
 
 ## Tools
 
-Power BI Desktop, Power Query, DAX, FMI open data.
+Python (pandas) for data cleaning, Power BI Desktop and DAX for the analysis and dashboard, FMI open data.
