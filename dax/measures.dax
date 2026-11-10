@@ -1,0 +1,57 @@
+// DAX measures used in Oulu_Snow_Delay.pbix
+
+AutumnAvgTemp = CALCULATE ( AVERAGE ( Weather[AvgTemp_C] ), Weather[DayOfSeason] >= 31, Weather[DayOfSeason] <= 70 )
+
+Frost Days Autumn = CALCULATE ( SUM ( Weather[IsFrostDay] ), Weather[DayOfSeason] >= 31, Weather[DayOfSeason] <= 70 )
+
+FirstSnowDay = CALCULATE ( MIN ( Weather[DayOfSeason] ), Weather[HasSnow] = 1 )
+
+First Snow Date = CALCULATE ( MIN ( Weather[Date] ), Weather[HasSnow] = 1 )
+
+PermanentSnowDay =
+MINX (
+    FILTER (
+        VALUES ( Weather[DayOfSeason] ),
+        VAR d = Weather[DayOfSeason]
+        RETURN
+            CALCULATE (
+                SUM ( Weather[HasSnow] ),
+                Weather[DayOfSeason] >= d,
+                Weather[DayOfSeason] <= d + 29
+            ) = 30
+    ),
+    Weather[DayOfSeason]
+)
+
+Permanent Snow Date =
+VAR d = [PermanentSnowDay]
+RETURN IF ( ISBLANK ( d ), BLANK (), MIN ( Weather[Date] ) + d - 1 )
+
+Days Without Snow =
+VAR snowDay = [First Snow Date]
+VAR seasonStart = MIN ( Weather[Date] )
+VAR seasonEnd = MAX ( Weather[Date] )
+RETURN
+    IF (
+        ISBLANK ( snowDay ),
+        DATEDIFF ( seasonStart, seasonEnd, DAY ) + 1,
+        DATEDIFF ( seasonStart, snowDay, DAY )
+    )
+
+Snow Status =
+VAR snowDay = [First Snow Date]
+RETURN
+    IF (
+        NOT HASONEVALUE ( Weather[Season] ),
+        "Select one season",
+        IF (
+            ISBLANK ( snowDay ),
+            "No snow yet – " & [Days Without Snow] & " days without snow",
+            "First snow on " & FORMAT ( snowDay, "d MMM yyyy" )
+                & " – after " & [Days Without Snow] & " days"
+        )
+    )
+
+TotalPrecip = SUM ( Weather[Precip_mm] )
+FrostDays = SUM ( Weather[IsFrostDay] )
+SnowDays = SUM ( Weather[HasSnow] )
