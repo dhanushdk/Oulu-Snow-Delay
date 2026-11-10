@@ -1,4 +1,5 @@
-# Why is snow late in Oulu? Autumns 2022–2026
+# Oulu Snow Delay Analysis
+### Why is snow late in Oulu? Autumns 2022–2026
 
 Living in Oulu, I noticed that last winter the snow came really late, and this year (November 2026) there is still no snow at all. I wanted to check if this is just a feeling or if the data actually shows it, and more importantly, why it happened.
 
